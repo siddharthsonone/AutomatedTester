@@ -3,7 +3,7 @@ from selenium import webdriver
 from page import *
 from scenario_launcher_page import *
 
-path = r'C:\chromedriver.exe'
+path = r''
 
 
 class TestMainPage(unittest.TestCase):
