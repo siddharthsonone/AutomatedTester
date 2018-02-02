@@ -72,8 +72,16 @@ class Locators:
                    '/html/body/div/main/div[2]/div[3]/aside/div/div/div[2]/div[1]/div/div[2]'
                    )
     FILTER_RAIO_TODAY = (By.XPATH,
-                         '/html/body/div/main/div[2]/div[3]/aside/div/div/div[2]/div[1]/div/div[2]/div[2]/div/div[2]/div/label[2]/div/input'
-                         )
+                         '/html/body/div/main/div[2]/div[3]/aside/div/div/div[2]/div[1]/div/div[2]/div[2]/div/div[2]/div/label[2]/div/input')
+
+    LOCATION_dropdown = (
+        By.XPATH, '/html/body/div/main/div[2]/div[2]/div[1]/div[2]/div/select')
+    LOCATION_dropdown_item = (
+        By.XPATH, '/html/body/div/main/div[2]/div[2]/div[1]/div[2]/div/select/option[8]')
+    LOCATION_dropdown_items = (
+        By.XPATH, '/html/body/div/main/div[2]/div[2]/div[1]/div[2]/div/select/option')
+    DOCTOR_tile = (
+        By.XPATH, '/html/body/div/main/div[2]/div[3]/div/div/div/section/article[1]')
 
 
 class LoadPage(unittest.TestCase):
@@ -83,6 +91,7 @@ class LoadPage(unittest.TestCase):
         cls.driver = webdriver.Firefox()
         cls.driver.get('https://providers.geisinger.org/search')
         cls.driver.maximize_window()
+        time.sleep(1)
 
     def test_load(self):
         self.driver.find_element(*Locators.HEADER)
@@ -203,6 +212,24 @@ class LoadPage(unittest.TestCase):
                 pass
 
         return self.results
+
+    def test_location_dropdown(self):
+        self.driver.find_element(*Locators.LOCATION_dropdown).click()
+
+        assert 'annual check up' in self.driver.find_element(
+            *Locators.LOCATION_dropdown_item).text
+        for dropwdownitems in self.driver.find_elements(*Locators.LOCATION_dropdown_items):
+            if 'annual pap smear / gyn exam' in dropwdownitems.text:
+                dropwdownitems.click()
+
+                tile = WebDriverWait(self.driver,
+                                     30).until(EC.visibility_of_element_located(Locators.DOCTOR_tile))
+                print '\n' + tile.text
+                assert 'gyn' in self.driver.find_element(
+                    *Locators.DOCTOR_tile).text.lower()
+
+            else:
+                continue
 
     @classmethod
     def tearDownClass(cls):
