@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import HtmlTestRunner
 import time
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
@@ -60,6 +61,7 @@ class Locators:
     FILTER_button = (By.XPATH,
                      '/html/body/div/main/div[2]/div[2]/div[2]/div/button'
                      )
+
     FILTER_toggle = (By.XPATH,
                      '/html/body/div/main/div[2]/div[2]/div[2]/div/button[1]/svg'
                      )
@@ -110,9 +112,8 @@ class LoadPage(unittest.TestCase):
 
         WebDriverWait(self.driver,
                       30).until(EC.visibility_of_element_located(Locators.FILTER))
-        count_filter = \
-            self.driver.find_element(*Locators.FILTER_button).text
-        assert 'refine matches' == count_filter
+        count_filter = self.driver.find_element(*Locators.FILTER_button).text
+        assert 'more filters' == count_filter
 
         # interact
 
@@ -124,10 +125,10 @@ class LoadPage(unittest.TestCase):
 
         self.filter_criterias = []
         for filter_options in \
-            self.driver.find_elements(*Locators.FILTER_PANE):
+                self.driver.find_elements(*Locators.FILTER_PANE):
             self.filter_criterias.append(filter_options.text)
             list_ = self.filter_criterias[0].encode('ascii', 'ignore'
-                    ).split('\n')
+                                                    ).split('\n')
         assert 'any day' in list_
         assert 'today' in list_
         assert 'next 3 days' in list_
@@ -145,8 +146,8 @@ class LoadPage(unittest.TestCase):
 
         WebDriverWait(self.driver,
                       30).until(EC.invisibility_of_element_located(Locators.FILTER_PANE))
-        assert 'refine (1 applied)' \
-            == self.driver.find_element(*Locators.FILTER_button).text
+        assert '1 applied' \
+            in self.driver.find_element(*Locators.FILTER_button).text
 
     def test_pagination(self):
         self.driver.refresh()
@@ -159,21 +160,21 @@ class LoadPage(unittest.TestCase):
 
     def test_seacrh(self):
         self.driver.find_element(*Locators.SEARCH_BOX).send_keys('Fever'
-                )
+                                                                 )
         time.sleep(2)
         self.results = []
         for result in \
-            self.driver.find_elements(*Locators.SPECIALITY_row_xpath_all):
+                self.driver.find_elements(*Locators.SPECIALITY_row_xpath_all):
             if 'Fever' in result.text:
 
                 assert 'rgb(255, 100, 115)' \
                     in result.find_element_by_tag_name('em'
-                        ).value_of_css_property('color')
+                                                       ).value_of_css_property('color')
                 self.results.append([result.text,
-                                    result.find_element_by_tag_name('em'
-                                    ).text,
-                                    result.find_element_by_tag_name('em'
-                                    ).value_of_css_property('color')])
+                                     result.find_element_by_tag_name('em'
+                                                                     ).text,
+                                     result.find_element_by_tag_name('em'
+                                                                     ).value_of_css_property('color')])
             else:
                 self.results.append([result.text])
                 pass
@@ -182,26 +183,23 @@ class LoadPage(unittest.TestCase):
 
     def test_location(self):
         self.driver.find_element(*Locators.LOCATION_BOX).clear()
-        self.driver.find_element(*Locators.LOCATION_BOX).send_keys('New'
-                )
+        self.driver.find_element(*Locators.LOCATION_BOX).send_keys('New')
         time.sleep(3)
         self.results = []
 
         for location in \
-            self.driver.find_elements(*Locators.LOCATION_row_xpath_all):
+                self.driver.find_elements(*Locators.LOCATION_row_xpath_all):
             if 'New' in location.text:
 
                 assert 'rgb(255, 100, 115)' \
                     in location.find_element_by_tag_name('mark'
-                        ).value_of_css_property('color')
+                                                         ).value_of_css_property('color')
                 self.results.append([location.text,
-                                    location.find_element_by_tag_name('mark'
-                                    ).text,
-                                    location.find_element_by_tag_name('mark'
-                                    ).value_of_css_property('color')])
+                                     location.find_element_by_tag_name('mark'
+                                                                       ).text,
+                                     location.find_element_by_tag_name('mark'
+                                                                       ).value_of_css_property('color')])
             else:
-
-                self.results.append([location.text])
                 pass
 
         return self.results
@@ -212,7 +210,5 @@ class LoadPage(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(verbosity=5)
-
-
-            
+    unittest.main(verbosity=5, testRunner=HtmlTestRunner.HTMLTestRunner(
+        output='example_dir'))
